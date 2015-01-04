@@ -1,11 +1,13 @@
-Foods = new Mongo.Collection("foods");
+Foods = new Mongo.Collection("Foods");
 
 if (Meteor.isClient) {
+  //Food categories checked stored in session array
+  Session.setDefault("foodCategoriesChecked", []);
 
   Template.body.helpers({
     //returns foods available
     foods: function () {
-      return Foods.find({Session.get(foodCategory): {$in: [true]}});
+      return Foods.find({});
     }
   });
 
@@ -23,37 +25,34 @@ if (Meteor.isClient) {
       Foods.remove(this._id);
     },
 
+    //food category toggles to session array
     "click .fruit": function () {
-      Meteor.call("foodCategoryToggleToSessionStore", "fruit");
+      Meteor.call("foodCategoriesCheckedToggleToSession", "fruit");
     },
     "click .starch": function () {
-      Meteor.call("foodCategoryToggleToSessionStore", "starch");
+      Meteor.call("foodCategoriesCheckedToggleToSession", "starch");
     },
     "click .beans": function () {
-      Meteor.call("foodCategoryToggleToSessionStore", "beans");
+      Meteor.call("foodCategoriesCheckedToggleToSession", "beans");
     },
     "click .greens": function () {
-      Meteor.call("foodCategoryToggleToSessionStore", "greens");
+      Meteor.call("foodCategoriesCheckedToggleToSession", "greens");
     }
   });
 }
 
 Meteor.methods({
-  //food category check box state stored to session
-  foodCategoryToggleToSessionStore: function (category) {
-    Session.setDefault(category, false);
-    Session.set(category, !Session.get(category));
-    console.log(Session.get(category));
-    console.log(Session);
+  //checks weather food category is in session array, then either adds or removes it
+  foodCategoriesCheckedToggleToSession: function(foodCategory) {
+    foodCategoriesChecked = Session.get("foodCategoriesChecked")
+    indexOfFoodCategory = foodCategoriesChecked.indexOf(foodCategory);
+    if (indexOfFoodCategory != -1)
+      foodCategoriesChecked.splice(indexOfFoodCategory, 1)
+    else
+      foodCategoriesChecked.push(foodCategory);
+    console.log(foodCategoriesChecked);
   }
-
 });
-
-
-
-
-
-
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
