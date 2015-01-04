@@ -5,10 +5,10 @@
 <body>
   <h1>My Food</h1>
 
-  <label>Fruit</label><input type="checkbox" class="fruit" />
-  <label>Starch</label><input type="checkbox" class="starch" />
-  <label>Beans</label><input type="checkbox" class="beans" />
-  <label>Greens</label><input type="checkbox" class="greens" />
+  <label>Fruit</label><input type="checkbox" value="Fruit" class="filter" />
+  <label>Starch</label><input type="checkbox" value="Starch" class="filter" />
+  <label>Beans</label><input type="checkbox" value="Beans" class="filter" />
+  <label>Greens</label><input type="checkbox"  value="Greens" class="filter" />
 
   <form class="new-food">
     <input type="text" name="food" placeholder="add food" />
@@ -18,12 +18,12 @@
 
   <ul>
     {{#each foods}}
-    {{> food}}
+      {{> food}}
     {{/each}}
   </ul>
 </body>
 
 <template name="food">
   <li>{{foodCategory}}, {{food}}</li>
-  <button class="delete"></button>
+  <button class="delete">x</button>
 </template>
