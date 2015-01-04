@@ -2,57 +2,77 @@ Foods = new Mongo.Collection("Foods");
 
 if (Meteor.isClient) {
   //Food categories checked stored in session array
-  Session.setDefault("foodCategoriesChecked", []);
+Session.setDefault("foodCategoriesChecked", []);
 
-  Template.body.helpers({
-    //returns foods available
-    foods: function () {
-      return Foods.find({});
-    }
-  });
-
-  Template.body.events({
-    //submits new food available
-    "submit .new-food": function (event) {
-      Foods.insert({foodCategory: event.target.foodCategory.value, food: event.target.food.value});
-      event.target.food.value = "";
-      event.target.foodCategory.value = "";
-      return false;
-    },
-
-    //removes food
-    "click .delete": function () {
-      Foods.remove(this._id);
-    },
-
-    //food category toggles to session array
-    "click .fruit": function () {
-      Meteor.call("foodCategoriesCheckedToggleToSession", "fruit");
-    },
-    "click .starch": function () {
-      Meteor.call("foodCategoriesCheckedToggleToSession", "starch");
-    },
-    "click .beans": function () {
-      Meteor.call("foodCategoriesCheckedToggleToSession", "beans");
-    },
-    "click .greens": function () {
-      Meteor.call("foodCategoriesCheckedToggleToSession", "greens");
-    }
-  });
-}
-
-Meteor.methods({
-  //checks weather food category is in session array, then either adds or removes it
-  foodCategoriesCheckedToggleToSession: function(foodCategory) {
-    foodCategoriesChecked = Session.get("foodCategoriesChecked")
-    indexOfFoodCategory = foodCategoriesChecked.indexOf(foodCategory);
-    if (indexOfFoodCategory != -1)
-      foodCategoriesChecked.splice(indexOfFoodCategory, 1)
-    else
-      foodCategoriesChecked.push(foodCategory);
-    console.log(foodCategoriesChecked);
+Template.body.helpers({
+  //returns foods available
+  foods: function () {
+    return Foods.find({
+      foodCategory: { 
+        $in: Session.get("foodCategoriesChecked")
+        }
+      });
   }
 });
+
+Template.body.events({
+  //submits new food available
+  "submit .new-food": function (event) {
+    event.preventDefault();
+    var foodCategory = event.target.foodCategory.value;
+    var food = event.target.food.value;
+    
+    Foods.insert({
+      foodCategory: foodCategory,
+      food: food
+      });
+  },
+
+  //removes food
+  "click .delete": function () {
+    Foods.remove(this._id);
+  },
+
+  //food category toggles to session array
+  "click .filter": function (event) {
+    var filter = event.target.value;
+    var toggleToTrue = event.target.checked;
+    
+    // get the Array from the session via get
+    var catArray = Session.get("foodCategoriesChecked");
+    
+    if (toggleToTrue) {
+      console.log(toggleToTrue);
+      console.log("Adding: " + filter);
+      
+      // push new filter to arrray
+      catArray.push(filter);
+      
+      // uses underscore to manupulate the array http://underscorejs.org/#uniq
+      catArray = _.uniq(catArray);
+      
+      console.log(catArray);
+      
+      // Put Array back into Session Variable for Update
+      Session.set("foodCategoriesChecked", catArray);
+      
+    } else {
+      console.log(toggleToTrue);
+      console.log("Removing: " + filter);
+      
+      // uses underscore to delete tge filter the array http://underscorejs.org/#without
+      catArray = _.without(catArray, filter)
+      
+      console.log(catArray);
+      
+      // Put Array back into Session Variable for Update
+      Session.set("foodCategoriesChecked", catArray);
+      
+    }
+    
+  }
+});
+}
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
