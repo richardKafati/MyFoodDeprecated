@@ -1,0 +1,29 @@
+<head>
+  <title>myFood</title>
+</head>
+
+<body>
+  <h1>My Food</h1>
+
+  <label>Fruit</label><input type="checkbox" class="fruit" />
+  <label>Starch</label><input type="checkbox" class="starch" />
+  <label>Beans</label><input type="checkbox" class="beans" />
+  <label>Greens</label><input type="checkbox" class="greens" />
+
+  <form class="new-food">
+    <input type="text" name="food" placeholder="add food" />
+    <input type="text" name="foodType" placeholder="food type" />
+    <button type="submit"></button>
+  </form>
+
+  <ul>
+    {{#each foods}}
+    {{> food}}
+    {{/each}}
+  </ul>
+</body>
+
+<template name="food">
+  <li>{{foodCategory}}, {{food}}</li>
+  <button class="delete"></button>
+</template>
